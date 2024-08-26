@@ -23,6 +23,13 @@ impl Default for GameState{
 fn main() {
     let mut game = Game::new();
 
+    // game.window_settings(WindowSettings{
+    //     title: "Tutorial!".to_string(),
+    //     width: 1280.0,
+    //     height: 720.0,
+    //     ..Default::default()
+    // });
+
     game.audio_manager.play_music(MusicPreset::Classy8Bit, 0.5);
 
     let player = game.add_sprite("player", SpritePreset::RacingCarBlue);
@@ -46,8 +53,22 @@ fn main() {
 }
 
 fn game_logic(engine: &mut Engine, game_state: &mut GameState){
-    // game_state.current_score += 1;
-    // println!("Current Score: {}", game_state.current_score);
+    // quit if Q key is pressed
+    if engine.keyboard_state.just_pressed(KeyCode::Q)
+    {
+        engine.should_exit = true;
+    }
+
+    // Keep text near the edges of the screen
+    let offset = (3.0*engine.time_since_startup_f64.sin()) as f32 * 5.0;
+    let score = engine.texts.get_mut("score").unwrap();
+    score.translation.x = engine.window_dimensions.x / 2.0 - 80.0;
+    score.translation.y = engine.window_dimensions.y / 2.0 - 30.0 + offset;
+
+    let high_score = engine.texts.get_mut("high_score").unwrap();
+    high_score.translation.x = -engine.window_dimensions.x / 2.0 + 80.0;
+    high_score.translation.y = engine.window_dimensions.y /2.0 - 30.0;
+
     // Handle collision
     engine.show_colliders = true;
 
