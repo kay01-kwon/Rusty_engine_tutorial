@@ -1,12 +1,12 @@
 // in src/main.rs
 use rusty_engine::prelude::*;
-
+use rand::prelude::*;
 #[derive(Resource)]
 struct GameState{
     high_score: u32,
     score: u32,
     enemy_index: i32,
-    // spawn_timer: Timer,
+    spawn_timer: Timer,
 }
 
 impl Default for GameState{
@@ -15,7 +15,7 @@ impl Default for GameState{
             high_score: 0,
             score: 0,
             enemy_index: 0,
-            // spawn_timer: Timer::from_seconds(1.0, TimerMode::Once),
+            spawn_timer: Timer::from_seconds(2.0, TimerMode::Repeating),
         }
     }
 }
@@ -117,6 +117,15 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState){
             car1.collision = true;
 
         }
+    }
+
+    if game_state.spawn_timer.tick(engine.delta).just_finished(){
+        let label = format!("enemy_{}", game_state.enemy_index);
+        game_state.enemy_index += 1;
+        let car1 = engine.add_sprite(label.clone(), SpritePreset::RacingCarYellow);
+        car1.translation.x = thread_rng().gen_range(-550.0..550.0);
+        car1.translation.y = thread_rng().gen_range(-325.0..325.0);
+        car1.collision = true;
     }
 
     // Reset score
